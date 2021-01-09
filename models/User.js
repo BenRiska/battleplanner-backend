@@ -7,12 +7,8 @@ const userSchema = new Schema({
     createdAt: String,
     events: [{
         name: String,
-        rules: [{
-            text: String
-        }],
-        restrictions: [{
-            text: String
-        }],
+        rules: [String],
+        restrictions: [String],
         participants: [{
             name: String,
             status: Boolean,

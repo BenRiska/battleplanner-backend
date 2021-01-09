@@ -4,9 +4,13 @@ module.exports = gql`
     type Participant {
         name: String!
         status: Boolean!
+    } 
+    type deleteResponse {
+        res: String!
     }
     type Tournament {
         name: String!
+        username: String!
         rules: [String!]
         restrictions: [String!]
         participants: [Participant!]
@@ -25,12 +29,18 @@ module.exports = gql`
         email: String!
     },
     type Query {
-        getUsers: [User!]!
+        getTournaments(username: String!): [Tournament!]!
     }
     type Mutation {
         register(registerInput: RegisterInput!): User!
         login(username: String!, password: String!): User!
-        createTournament(userId: String!): User!
-        deleteTournament(userId: ID!, tournamentId: ID!): User!
+        createTournament(tournamentName: ID!): Tournament!
+        deleteTournament(tournamentName: ID!): deleteResponse!
+        addRule(tournamentName: String!, rule: String!): Tournament!
+        deleteRule(tournamentName: String!, rule: String!): Tournament!
+        addRestriction(tournamentName: String!, restriction: String!): Tournament!
+        deleteRestriction(tournamentName: String!, restriction: String!): Tournament!
+        addParticipant(tournamentName: String!, name: String!, status: Boolean!): Tournament!
+        deleteParticipant(tournamentName: String!, name: String!, status: Boolean!): Tournament!
     }
 `
