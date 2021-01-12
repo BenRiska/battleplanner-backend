@@ -30,17 +30,18 @@ module.exports = gql`
     },
     type Query {
         getTournaments(username: String!): [Tournament!]!
+        getTournament(username: String!, tournamentName: String!): Tournament!
     }
     type Mutation {
         register(registerInput: RegisterInput!): User!
         login(username: String!, password: String!): User!
-        createTournament(tournamentName: ID!): Tournament!
-        deleteTournament(tournamentName: ID!): deleteResponse!
-        addRule(tournamentName: String!, rule: String!): Tournament!
+        createTournament(tournamentName: String!): Tournament!
+        deleteTournament(tournamentName: String!): deleteResponse!
+        addRule(username: String!, tournamentName: String!, rule: String!): Tournament!
         deleteRule(tournamentName: String!, rule: String!): Tournament!
         addRestriction(tournamentName: String!, restriction: String!): Tournament!
         deleteRestriction(tournamentName: String!, restriction: String!): Tournament!
-        addParticipant(tournamentName: String!, name: String!, status: Boolean!): Tournament!
-        deleteParticipant(tournamentName: String!, name: String!, status: Boolean!): Tournament!
+        addParticipant(tournamentName: String!, name: String!): Tournament!
+        deleteParticipant(tournamentName: String!, name: String!): Tournament!
     }
 `

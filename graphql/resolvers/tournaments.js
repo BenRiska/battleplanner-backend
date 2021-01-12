@@ -21,6 +21,25 @@ module.exports = {
 
             return tournaments
 
+        },
+        async getTournament(_, {username, tournamentName}, context){
+
+            // check user is authorized
+            const user = checkAuth(context);
+
+            // throw error if not authorized
+           if(!user){
+            throw new UserInputError("User not authorized")
+            }
+
+            const tournament = await Tournament.find({username, name: tournamentName})
+
+            if(!tournament){
+                throw new UserInputError("Tournament doesn't exist.")
+            }
+
+            return tournament[0]
+
         }
     },
     Mutation: {
@@ -41,16 +60,16 @@ module.exports = {
                     "Tournament name already exists.")
             }
 
-           const newTournament = new Tournament({
+           let newTournament = new Tournament({
                username: user.username,
                name: tournamentName,
            })
 
             const tournament = await newTournament.save()
 
-           console.log(tournament)
+            newTournament = await Tournament.findOne({name: tournamentName, username: user.username})
 
-           return tournament
+           return newTournament
 
         },
         async deleteTournament(_, {tournamentName}, context){
@@ -83,17 +102,19 @@ module.exports = {
             return {res: "Tournament deleted sucsessfully"}
 
         },
-        async addRule(_, {tournamentName, rule }, context){
+        async addRule(_, {username, tournamentName, rule }, context){
 
             // check user is authorized
             const user = checkAuth(context);
+
+            console.log("hit")
 
             // throw error if not authorized
            if(!user){
             throw new UserInputError("User not authorized")
             }
 
-            const query = {username: user.username, name: tournamentName}
+            const query = {username, name: tournamentName}
 
             // check if tournament exists
             let tournament = await Tournament.findOne(query)
@@ -257,7 +278,9 @@ module.exports = {
             return tournament
 
         },
-        async addParticipant(_, {tournamentName, name, status}, context){
+        async addParticipant(_, {tournamentName, name}, context){
+
+            console.log("hi")
 
             // check user is authorized
             const user = checkAuth(context);
@@ -268,7 +291,7 @@ module.exports = {
             }
 
             const query = {username: user.username, name: tournamentName}
-            const participant = {name, status}
+            const participant = {name, status: true}
 
             // check if tournament exists
             let tournament = await Tournament.findOne(query)
@@ -303,7 +326,7 @@ module.exports = {
             return tournament
 
         },
-        async deleteParticipant(_, {tournamentName, name, status}, context){
+        async deleteParticipant(_, {tournamentName, name}, context){
 
             // check user is authorized
             const user = checkAuth(context);
@@ -314,7 +337,7 @@ module.exports = {
             }
 
             const query = {username: user.username, name: tournamentName}
-            const participant = {name, status}
+            
 
             // check if tournament exists
             let tournament = await Tournament.findOne(query)
@@ -325,7 +348,7 @@ module.exports = {
                     "Tournament doesn't exist.")
             }
 
-            const target = tournament.participants.filter(p => p.name === participant.name)
+            const target = tournament.participants.filter(p => p.name === name)
 
             //check if rule already exists
             if(target.length === 0){
@@ -334,7 +357,7 @@ module.exports = {
             }
 
             // create new rules
-            const newParticipants = tournament.participants.filter(p => p.name !== participant.name)
+            const newParticipants = tournament.participants.filter(p => p.name !== name)
 
             //update rules in model
             tournament = Tournament.findOneAndUpdate(query, {
