@@ -5,6 +5,11 @@ module.exports = gql`
         name: String!
         status: Boolean!
     } 
+    type Fight {
+        fighterOne: String!
+        fighterTwo: String!
+        concluded: Boolean!
+    }
     type deleteResponse {
         res: String!
     }
@@ -14,6 +19,10 @@ module.exports = gql`
         rules: [String!]
         restrictions: [String!]
         participants: [Participant!]
+        active: Boolean!
+        fights: [Fight!]
+        round: Int
+        winner: String
     }
     type User {
         id: ID!
@@ -43,5 +52,7 @@ module.exports = gql`
         deleteRestriction(tournamentName: String!, restriction: String!): Tournament!
         addParticipant(tournamentName: String!, name: String!): Tournament!
         deleteParticipant(tournamentName: String!, name: String!): Tournament!
+        endTournament(winner: String!, tournamentName: String!): Tournament!
+        startRound(tournamentName: String!): Tournament!
     }
 `

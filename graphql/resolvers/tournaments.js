@@ -63,6 +63,8 @@ module.exports = {
            let newTournament = new Tournament({
                username: user.username,
                name: tournamentName,
+               active: true,
+               round: 0
            })
 
             const tournament = await newTournament.save()
@@ -280,8 +282,6 @@ module.exports = {
         },
         async addParticipant(_, {tournamentName, name}, context){
 
-            console.log("hi")
-
             // check user is authorized
             const user = checkAuth(context);
 
@@ -292,6 +292,7 @@ module.exports = {
 
             const query = {username: user.username, name: tournamentName}
             const participant = {name, status: true}
+
 
             // check if tournament exists
             let tournament = await Tournament.findOne(query)
@@ -371,5 +372,103 @@ module.exports = {
             return tournament
 
         },
+        async endTournament(_, {winner, tournamentName}, context){
+
+            // check user is authorized
+            const user = checkAuth(context);
+
+            // throw error if not authorized
+           if(!user){
+            throw new UserInputError("User not authorized")
+            }
+
+            const query = {username: user.username, name: tournamentName}
+            
+
+            // check if tournament exists
+            let tournament = await Tournament.findOne(query)
+
+            // throw error if it doesn't
+            if(!tournament){
+                throw new UserInputError(
+                    "Tournament doesn't exist.")
+            }
+
+             //update rules in model
+             tournament = Tournament.findOneAndUpdate(query, {
+                winner,
+                active: false
+            }, (err) => {
+                if(err){
+                    throw new UserInputError("Problem connecting with database.")
+                }
+            });
+
+            return tournament
+        },
+        async startRound(_, {tournamentName}, context){
+            // check user is authorized
+            const user = checkAuth(context);
+
+            // throw error if not authorized
+           if(!user){
+            throw new UserInputError("User not authorized")
+            }
+
+            const query = {username: user.username, name: tournamentName}
+            
+
+            // check if tournament exists
+            let tournament = await Tournament.findOne(query)
+
+            // throw error if it doesn't
+            if(!tournament){
+                throw new UserInputError(
+                    "Tournament doesn't exist.")
+            }
+
+            if(tournament.participants.length < 2){
+                throw new UserInputError(
+                    "Not enough participants")
+            }
+
+            if(tournament.winner || !tournament.active){
+                throw new UserInputError(
+                    "Tournament has concluded")
+            }
+
+            let participantList = tournament.participants
+
+            let fighterOneList = participantList.slice(0, (participantList.length / 2))
+
+            let fighterTwoList = participantList.slice((participantList.length / 2), participantList.length)
+
+            let matchups = []
+
+            fighterOneList.forEach((fighter, index) => {
+                matchups.push({
+                    fighterOne: fighter.name, 
+                    fighterTwo: fighterTwoList[index].name, 
+                    concluded: false
+                })
+            })
+
+            let round = tournament.round + 1
+
+            console.log(round, matchups)
+
+            //update rules in model
+            tournament = Tournament.findOneAndUpdate(query, {
+                fights: matchups,
+                round
+            }, (err) => {
+                if(err){
+                    throw new UserInputError("Problem connecting with database.")
+                }
+            });
+
+            
+            return tournament
+        }
     }
 }

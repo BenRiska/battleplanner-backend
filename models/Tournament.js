@@ -6,10 +6,18 @@ const tournamentSchema = new Schema({
     username: String,
     restrictions: [String],
     rules: [String],
+    active: Boolean,
     participants: [{
         name: String,
         status: Boolean
     }],
+    fights: [{
+        fighterOne: String,
+        fighterTwo: String,
+        concluded: Boolean
+    }],
+    round: Number,
+    winner: String,
     user: [{
         type: Schema.Types.ObjectId,
         ref: "users"
