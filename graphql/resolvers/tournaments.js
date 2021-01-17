@@ -63,7 +63,7 @@ module.exports = {
            let newTournament = new Tournament({
                username: user.username,
                name: tournamentName,
-               active: true,
+               active: false,
                round: 0
            })
 
@@ -432,7 +432,7 @@ module.exports = {
                     "Not enough participants")
             }
 
-            if(tournament.winner || !tournament.active){
+            if(tournament.winner){
                 throw new UserInputError(
                     "Tournament has concluded")
             }
@@ -460,7 +460,8 @@ module.exports = {
             //update rules in model
             tournament = Tournament.findOneAndUpdate(query, {
                 fights: matchups,
-                round
+                round,
+                active: true
             }, (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
