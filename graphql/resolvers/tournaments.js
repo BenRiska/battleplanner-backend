@@ -406,7 +406,7 @@ module.exports = {
 
             return tournament
         },
-        async startRound(_, {tournamentName}, context){
+        async startGame(_, {tournamentName}, context){
             // check user is authorized
             const user = checkAuth(context);
 
@@ -449,7 +449,8 @@ module.exports = {
                 matchups.push({
                     fighterOne: fighter.name, 
                     fighterTwo: fighterTwoList[index].name, 
-                    concluded: false
+                    concluded: false,
+                    winner: ""
                 })
             })
 
@@ -470,6 +471,117 @@ module.exports = {
 
             
             return tournament
+        },
+        async endFight(_, {tournamentName, winner}, context){
+
+            // check user is authorized
+            const user = checkAuth(context);
+
+            // throw error if not authorized
+           if(!user){
+            throw new UserInputError("User not authorized")
+            }
+
+            const query = {username: user.username, name: tournamentName}
+            
+
+            // check if tournament exists
+            let tournament = await Tournament.findOne(query)
+
+            // throw error if it doesn't
+            if(!tournament){
+                throw new UserInputError(
+                    "Tournament doesn't exist.")
+            }
+
+            const fightList = tournament.fights.map(oldFight => {
+                if(oldFight.fighterOne === winner ||
+                   oldFight.fighterTwo === winner){
+                    oldFight.concluded = true
+                    oldFight.winner = winner
+                }
+                return oldFight
+            })
+
+            if(fightList.length < 2){
+                //update rules in model
+            tournament = Tournament.findOneAndUpdate(query, {
+                fights: fightList,
+                winner: fightList[0].winner
+            }, (err) => {
+                if(err){
+                    throw new UserInputError("Problem connecting with database.")
+                }
+            });
+            } else{
+                //update rules in model
+            tournament = Tournament.findOneAndUpdate(query, {
+                fights: fightList
+            }, (err) => {
+                if(err){
+                    throw new UserInputError("Problem connecting with database.")
+                }
+            });
+            }
+
+
+            return tournament
+
+        },
+        async startNextRound(_, {tournamentName}, context){
+
+            // check user is authorized
+            const user = checkAuth(context);
+
+            // throw error if not authorized
+           if(!user){
+            throw new UserInputError("User not authorized")
+            }
+
+            const query = {username: user.username, name: tournamentName}
+            
+
+            // check if tournament exists
+            let tournament = await Tournament.findOne(query)
+
+            // throw error if it doesn't
+            if(!tournament){
+                throw new UserInputError(
+                    "Tournament doesn't exist.")
+            }
+
+            let winners = tournament.fights.map(fight => fight.winner)
+
+            let fighterOneList = winners.slice(0, (winners.length / 2))
+
+            let fighterTwoList = winners.slice((winners.length / 2), winners.length)
+
+            let matchups = []
+
+            fighterOneList.forEach((fighter, index) => {
+                matchups.push({
+                    fighterOne: fighter, 
+                    fighterTwo: fighterTwoList[index], 
+                    concluded: false,
+                    winner: ""
+                })
+            })
+
+            let round = tournament.round + 1
+
+             //update rules in model
+             tournament = Tournament.findOneAndUpdate(query, {
+                fights: matchups,
+                round,
+                active: true
+            }, (err) => {
+                if(err){
+                    throw new UserInputError("Problem connecting with database.")
+                }
+            });
+
+            return tournament
+
         }
     }
 }

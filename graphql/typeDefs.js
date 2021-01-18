@@ -9,6 +9,7 @@ module.exports = gql`
         fighterOne: String!
         fighterTwo: String!
         concluded: Boolean!
+        winner: String
     }
     type deleteResponse {
         res: String!
@@ -53,6 +54,8 @@ module.exports = gql`
         addParticipant(tournamentName: String!, name: String!): Tournament!
         deleteParticipant(tournamentName: String!, name: String!): Tournament!
         endTournament(winner: String!, tournamentName: String!): Tournament!
-        startRound(tournamentName: String!): Tournament!
+        startGame(tournamentName: String!): Tournament!
+        endFight(tournamentName: String!, winner: String!): Tournament!
+        startNextRound(tournamentName: String!): Tournament!
     }
 `

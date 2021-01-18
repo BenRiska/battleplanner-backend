@@ -14,7 +14,8 @@ const tournamentSchema = new Schema({
     fights: [{
         fighterOne: String,
         fighterTwo: String,
-        concluded: Boolean
+        concluded: Boolean,
+        winner: String
     }],
     round: Number,
     winner: String,
