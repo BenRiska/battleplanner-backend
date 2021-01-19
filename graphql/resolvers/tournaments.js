@@ -24,7 +24,7 @@ module.exports = {
             return tournaments
 
         },
-        async getTournament(_, {username, tournamentName}, context){
+        async getTournament(_, {tournamentName}, context){
 
             // check user is authorized
             const user = checkAuth(context);
@@ -35,7 +35,7 @@ module.exports = {
             }
 
             // find tournament
-            const tournament = await Tournament.find({username, name: tournamentName})
+            const tournament = await Tournament.find({username: user.username, name: tournamentName})
 
             // check tournament was there
             if(!tournament){
@@ -72,20 +72,25 @@ module.exports = {
                username: user.username,
                name: tournamentName,
                active: false,
-               round: 0
+               round: 0,
+               rules: [],
+               restrictions: [],
+               participants: [],
            })
 
            // save new tournament
-            const tournament = await newTournament.save()
+            let tournament = await newTournament.save()
 
             // get new tournament
-            newTournament = await Tournament.findOne({name: tournamentName, username: user.username})
-
+            tournament = await Tournament.findOne({name: tournamentName, username: user.username})
+            
             // return tournament
-           return newTournament
+           return tournament
 
         },
         async deleteTournament(_, {tournamentName}, context){
+
+            console.log("hit")
              // check user is authorized
              const user = checkAuth(context);
 
@@ -111,23 +116,25 @@ module.exports = {
                 }
             })
 
+            const tournaments = await Tournament.find({username: user.username})
+
+            console.log(tournaments)
+
             // send confirmation response
-            return {res: "Tournament deleted sucsessfully"}
+            return tournaments
 
         },
-        async addRule(_, {username, tournamentName, rule }, context){
+        async addRule(_, {tournamentName, rule }, context){
 
             // check user is authorized
             const user = checkAuth(context);
-
-            console.log("hit")
 
             // throw error if not authorized
            if(!user){
             throw new UserInputError("User not authorized")
             }
 
-            const query = {username, name: tournamentName}
+            const query = {username: user.username, name: tournamentName}
 
             // check if tournament exists
             let tournament = await Tournament.findOne(query)
