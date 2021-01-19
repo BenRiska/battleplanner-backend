@@ -17,8 +17,10 @@ module.exports = {
             throw new UserInputError("User not authorized")
             }
 
+            // get tournaments
             const tournaments = await Tournament.find({username})
 
+            // return tournaments array
             return tournaments
 
         },
@@ -32,12 +34,15 @@ module.exports = {
             throw new UserInputError("User not authorized")
             }
 
+            // find tournament
             const tournament = await Tournament.find({username, name: tournamentName})
 
+            // check tournament was there
             if(!tournament){
                 throw new UserInputError("Tournament doesn't exist.")
             }
 
+            // return tournament
             return tournament[0]
 
         }
@@ -53,13 +58,16 @@ module.exports = {
             throw new UserInputError("User not authorized")
             }
 
+            // see if tournament already exists
             const existingTournament = await Tournament.findOne({name: tournamentName, username: user.username})
 
+            // check and throw error
             if(existingTournament){
                 throw new UserInputError(
                     "Tournament name already exists.")
             }
 
+            // create new tournament object
            let newTournament = new Tournament({
                username: user.username,
                name: tournamentName,
@@ -67,10 +75,13 @@ module.exports = {
                round: 0
            })
 
+           // save new tournament
             const tournament = await newTournament.save()
 
+            // get new tournament
             newTournament = await Tournament.findOne({name: tournamentName, username: user.username})
 
+            // return tournament
            return newTournament
 
         },
@@ -290,6 +301,7 @@ module.exports = {
             throw new UserInputError("User not authorized")
             }
 
+            // create query objects
             const query = {username: user.username, name: tournamentName}
             const participant = {name, status: true}
 
@@ -303,9 +315,10 @@ module.exports = {
                     "Tournament doesn't exist.")
             }
 
+            // check if person already exists
             const target = tournament.participants.filter(p => p.name === participant.name)
 
-            //check if rule already exists
+            //throw error if exists
             if(target.length > 0){
                 throw new UserInputError(
                     "Participant already exists.")
@@ -337,6 +350,7 @@ module.exports = {
             throw new UserInputError("User not authorized")
             }
 
+            // create query object
             const query = {username: user.username, name: tournamentName}
             
 
@@ -349,18 +363,19 @@ module.exports = {
                     "Tournament doesn't exist.")
             }
 
+            // check if person exists
             const target = tournament.participants.filter(p => p.name === name)
 
-            //check if rule already exists
+            //throw error if doesnt exist
             if(target.length === 0){
                 throw new UserInputError(
                     "Participant doesn't exist.")
             }
 
-            // create new rules
+            // create new participants array
             const newParticipants = tournament.participants.filter(p => p.name !== name)
 
-            //update rules in model
+            //update participants in model
             tournament = Tournament.findOneAndUpdate(query, {
                 participants: newParticipants
             }, (err) => {
@@ -369,6 +384,7 @@ module.exports = {
                 }
             });
 
+            // return tournament
             return tournament
 
         },
@@ -382,6 +398,7 @@ module.exports = {
             throw new UserInputError("User not authorized")
             }
 
+            // create query object
             const query = {username: user.username, name: tournamentName}
             
 
@@ -404,6 +421,7 @@ module.exports = {
                 }
             });
 
+            // return tournament
             return tournament
         },
         async startGame(_, {tournamentName}, context){
@@ -415,6 +433,7 @@ module.exports = {
             throw new UserInputError("User not authorized")
             }
 
+            // create query object
             const query = {username: user.username, name: tournamentName}
             
 
@@ -427,24 +446,29 @@ module.exports = {
                     "Tournament doesn't exist.")
             }
 
+            // check if there are enough players
             if(tournament.participants.length < 2){
                 throw new UserInputError(
                     "Not enough participants")
             }
 
+            // check tournament hasn't already ended
             if(tournament.winner){
                 throw new UserInputError(
                     "Tournament has concluded")
             }
 
+            // get participants
             let participantList = tournament.participants
 
+            // split list in 2 halves
             let fighterOneList = participantList.slice(0, (participantList.length / 2))
 
             let fighterTwoList = participantList.slice((participantList.length / 2), participantList.length)
 
             let matchups = []
 
+            // create matchups with both halves
             fighterOneList.forEach((fighter, index) => {
                 matchups.push({
                     fighterOne: fighter.name, 
@@ -454,9 +478,8 @@ module.exports = {
                 })
             })
 
+            // increase round number
             let round = tournament.round + 1
-
-            console.log(round, matchups)
 
             //update rules in model
             tournament = Tournament.findOneAndUpdate(query, {
@@ -469,7 +492,7 @@ module.exports = {
                 }
             });
 
-            
+            // return tournament
             return tournament
         },
         async endFight(_, {tournamentName, winner}, context){
@@ -482,6 +505,7 @@ module.exports = {
             throw new UserInputError("User not authorized")
             }
 
+            // create query object
             const query = {username: user.username, name: tournamentName}
             
 
@@ -494,6 +518,7 @@ module.exports = {
                     "Tournament doesn't exist.")
             }
 
+            // alter fight object to show winner
             const fightList = tournament.fights.map(oldFight => {
                 if(oldFight.fighterOne === winner ||
                    oldFight.fighterTwo === winner){
@@ -503,11 +528,13 @@ module.exports = {
                 return oldFight
             })
 
+            // check if that was the last match and either conclude tournament or continue next fight
             if(fightList.length < 2){
                 //update rules in model
             tournament = Tournament.findOneAndUpdate(query, {
                 fights: fightList,
-                winner: fightList[0].winner
+                winner: fightList[0].winner,
+                active: false
             }, (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
@@ -524,7 +551,7 @@ module.exports = {
             });
             }
 
-
+            // return tournament
             return tournament
 
         },
@@ -538,6 +565,7 @@ module.exports = {
             throw new UserInputError("User not authorized")
             }
 
+            // create query object
             const query = {username: user.username, name: tournamentName}
             
 
@@ -550,14 +578,17 @@ module.exports = {
                     "Tournament doesn't exist.")
             }
 
+            // get winners to go to the next round
             let winners = tournament.fights.map(fight => fight.winner)
 
+            // split winners list in half
             let fighterOneList = winners.slice(0, (winners.length / 2))
 
             let fighterTwoList = winners.slice((winners.length / 2), winners.length)
 
             let matchups = []
 
+            // use those halves to create matchups
             fighterOneList.forEach((fighter, index) => {
                 matchups.push({
                     fighterOne: fighter, 
@@ -567,6 +598,7 @@ module.exports = {
                 })
             })
 
+            // increase round number
             let round = tournament.round + 1
 
              //update rules in model
@@ -580,6 +612,7 @@ module.exports = {
                 }
             });
 
+            // return tournament
             return tournament
 
         }
