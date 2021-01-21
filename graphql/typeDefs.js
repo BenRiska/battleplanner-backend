@@ -2,10 +2,12 @@ const gql = require("graphql-tag");
 
 module.exports = gql`
     type Participant {
+        id: ID!
         name: String!
         status: Boolean!
     } 
     type Fight {
+        id: ID!
         fighterOne: String!
         fighterTwo: String!
         concluded: Boolean!
@@ -15,6 +17,7 @@ module.exports = gql`
         res: String!
     }
     type Tournament {
+        id: ID!
         name: String!
         username: String!
         rules: [String!]
