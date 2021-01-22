@@ -90,7 +90,6 @@ module.exports = {
         },
         async deleteTournament(_, {tournamentName}, context){
 
-            console.log("hit")
              // check user is authorized
              const user = checkAuth(context);
 
@@ -116,9 +115,9 @@ module.exports = {
                 }
             })
 
-            const tournaments = await Tournament.find({username: user.username})
+            let tournaments = await Tournament.find({username: user.username})
 
-            console.log(tournaments)
+            tournaments = tournaments.filter(i => i.id !== tournament.id)
 
             // send confirmation response
             return tournaments
@@ -152,16 +151,13 @@ module.exports = {
             }
 
             // update tournament
-            Tournament.findOneAndUpdate(query, {
+            tournament = await Tournament.findOneAndUpdate(query, {
                 rules: [...tournament.rules, rule]
             }, (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
             });
-
-            // get new tournament object
-            tournament = await Tournament.findOne(query)
 
             // return tournament
             return tournament
@@ -198,16 +194,13 @@ module.exports = {
             const newRules = tournament.rules.filter(r => r !== rule)
 
             //update rules in model
-            Tournament.findOneAndUpdate(query, {
+            tournament = await Tournament.findOneAndUpdate(query, {
                 rules: newRules
             }, (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
             });
-
-            // get new tournament object
-            tournament = await Tournament.findOne(query)
 
             // return tournament
             return tournament
@@ -241,16 +234,13 @@ module.exports = {
             }
 
             // update tournament
-            Tournament.findOneAndUpdate(query, {
+            tournament = await Tournament.findOneAndUpdate(query, {
                 restrictions: [...tournament.restrictions, restriction]
             }, (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
             });
-
-            // get new tournament object
-            tournament = await Tournament.findOne(query)
 
             // return tournament
             return tournament
@@ -287,7 +277,7 @@ module.exports = {
             const newRestrictions = tournament.restrictions.filter(r => r !== restriction)
 
             //update rules in model
-            tournament = Tournament.findOneAndUpdate(query, {
+            tournament = await Tournament.findOneAndUpdate(query, {
                 restrictions: newRestrictions
             }, (err) => {
                 if(err){
@@ -332,16 +322,13 @@ module.exports = {
             }
 
             // update tournament
-            Tournament.findOneAndUpdate(query, {
+            tournament = await Tournament.findOneAndUpdate(query, {
                 participants: [...tournament.participants, participant]
             }, (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
             });
-
-            // get new tournament object
-            tournament = await Tournament.findOne(query)
 
             // return tournament
             return tournament
@@ -383,7 +370,7 @@ module.exports = {
             const newParticipants = tournament.participants.filter(p => p.name !== name)
 
             //update participants in model
-            tournament = Tournament.findOneAndUpdate(query, {
+            tournament = await Tournament.findOneAndUpdate(query, {
                 participants: newParticipants
             }, (err) => {
                 if(err){
@@ -419,7 +406,7 @@ module.exports = {
             }
 
              //update rules in model
-             tournament = Tournament.findOneAndUpdate(query, {
+             tournament = await Tournament.findOneAndUpdate(query, {
                 winner,
                 active: false
             }, (err) => {
@@ -489,7 +476,7 @@ module.exports = {
             let round = tournament.round + 1
 
             //update rules in model
-            tournament = Tournament.findOneAndUpdate(query, {
+            tournament = await Tournament.findOneAndUpdate(query, {
                 fights: matchups,
                 round,
                 active: true
@@ -538,7 +525,7 @@ module.exports = {
             // check if that was the last match and either conclude tournament or continue next fight
             if(fightList.length < 2){
                 //update rules in model
-            tournament = Tournament.findOneAndUpdate(query, {
+            tournament = await Tournament.findOneAndUpdate(query, {
                 fights: fightList,
                 winner: fightList[0].winner,
                 active: false
@@ -549,7 +536,7 @@ module.exports = {
             });
             } else{
                 //update rules in model
-            tournament = Tournament.findOneAndUpdate(query, {
+            tournament = await Tournament.findOneAndUpdate(query, {
                 fights: fightList
             }, (err) => {
                 if(err){
@@ -609,7 +596,7 @@ module.exports = {
             let round = tournament.round + 1
 
              //update rules in model
-             tournament = Tournament.findOneAndUpdate(query, {
+             tournament = await Tournament.findOneAndUpdate(query, {
                 fights: matchups,
                 round,
                 active: true
