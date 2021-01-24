@@ -153,11 +153,15 @@ module.exports = {
             // update tournament
             tournament = await Tournament.findOneAndUpdate(query, {
                 rules: [...tournament.rules, rule]
-            }, (err) => {
+            },
+            { new: true },
+            (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
             });
+
+            console.log(tournament)
 
             // return tournament
             return tournament
@@ -196,7 +200,9 @@ module.exports = {
             //update rules in model
             tournament = await Tournament.findOneAndUpdate(query, {
                 rules: newRules
-            }, (err) => {
+            },
+            { new: true },
+             (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
@@ -236,7 +242,9 @@ module.exports = {
             // update tournament
             tournament = await Tournament.findOneAndUpdate(query, {
                 restrictions: [...tournament.restrictions, restriction]
-            }, (err) => {
+            },
+            { new: true },
+             (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
@@ -279,7 +287,9 @@ module.exports = {
             //update rules in model
             tournament = await Tournament.findOneAndUpdate(query, {
                 restrictions: newRestrictions
-            }, (err) => {
+            },
+            { new: true },
+             (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
@@ -324,7 +334,9 @@ module.exports = {
             // update tournament
             tournament = await Tournament.findOneAndUpdate(query, {
                 participants: [...tournament.participants, participant]
-            }, (err) => {
+            },
+            { new: true },
+             (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
@@ -372,7 +384,9 @@ module.exports = {
             //update participants in model
             tournament = await Tournament.findOneAndUpdate(query, {
                 participants: newParticipants
-            }, (err) => {
+            },
+            { new: true },
+             (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
@@ -409,7 +423,9 @@ module.exports = {
              tournament = await Tournament.findOneAndUpdate(query, {
                 winner,
                 active: false
-            }, (err) => {
+            },
+            { new: true },
+             (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
@@ -480,7 +496,9 @@ module.exports = {
                 fights: matchups,
                 round,
                 active: true
-            }, (err) => {
+            },
+            { new: true },
+             (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
@@ -538,7 +556,9 @@ module.exports = {
                 //update rules in model
             tournament = await Tournament.findOneAndUpdate(query, {
                 fights: fightList
-            }, (err) => {
+            },
+            { new: true },
+             (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
@@ -600,7 +620,9 @@ module.exports = {
                 fights: matchups,
                 round,
                 active: true
-            }, (err) => {
+            },
+            { new: true },
+             (err) => {
                 if(err){
                     throw new UserInputError("Problem connecting with database.")
                 }
