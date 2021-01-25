@@ -5,18 +5,12 @@ const {MONGODB} = require("./config");
 const typeDefs = require("./graphql/typeDefs")
 const resolvers = require("./graphql/resolvers")
 
-const corsOptions = {
-    origin: "http://localhost:3000",
-    credentials: true
-};
-
 const PORT = process.env.PORT || 5000
 
 const server = new ApolloServer({
     typeDefs,
     resolvers,
     context: ({req}) => ({req}),
-    cors: corsOptions
 })
 
 mongoose.connect(MONGODB, {useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false}).then(() => {
