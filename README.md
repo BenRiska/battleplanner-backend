@@ -4,11 +4,12 @@
 <p>Languages: </p>
 <p><img src="https://img.shields.io/badge/-JavaScript-white?style=flat-square&logo=javascript" />
   
-<p>Framework: </p>
+<p>Technology: </p>
 <p>
 <img src="https://img.shields.io/badge/-MongoDB-white?style=flat-square&logo=mongodb" />
 <img src="https://img.shields.io/badge/-Express-white?style=flat-square&logo=express&logoColor=000000" />
 <img src="https://img.shields.io/badge/-Node.js-white?style=flat-square&logo=Node.js" />
+  <img src="https://img.shields.io/badge/-JWT-white?style=flat-square&logo=jsonwebtoken" />
 </p>
 
 <p>Hosting: </p>
