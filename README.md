@@ -12,5 +12,5 @@
 </p>
 
 <p>Hosting: </p>
-<p><img src="https://img.shields.io/badge/-Heroku-white?style=flat-square&logo=heroku" /></p>
+<p><img src="https://img.shields.io/badge/-Heroku-white?style=flat-square&logo=heroku&logoColor=591EB1" /></p>
 </h5>
