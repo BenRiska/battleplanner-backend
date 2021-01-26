@@ -10,7 +10,7 @@
 <img src="https://img.shields.io/badge/-Express-white?style=flat-square&logo=express&logoColor=000000" />
 <img src="https://img.shields.io/badge/-Node.js-white?style=flat-square&logo=Node.js" />
  <img src="https://img.shields.io/badge/-JWT-white?style=flat-square&logo=jsonwebtoken" />
-   <img src="https://img.shields.io/badge/-GraphQL-white?style=flat-square&logo=graphql" />
+   <img src="https://img.shields.io/badge/-GraphQL-white?style=flat-square&logo=graphql&logoColor=DD35A5" />
    <img src="https://img.shields.io/badge/-Apollo-white?style=flat-square&logo=apollo" />
 </p>
 
